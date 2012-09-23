@@ -1,4 +1,4 @@
-#include "cornerstone.h"
+#include "cornerstone-priv.h"
 
 static const struct luaL_Reg functions[] = {
   { NULL, NULL }

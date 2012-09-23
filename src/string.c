@@ -1,4 +1,4 @@
-#include "cornerstone.h"
+#include "cornerstone-priv.h"
  
 static int ends_with(lua_State *L) {
   size_t str_len;
