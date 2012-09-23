@@ -6,5 +6,6 @@ static const struct luaL_Reg functions[] = {
 
 int luaopen_cornerstone(lua_State *L) {
   luaL_register(L, "cornerstone", functions);
+  luaopen_string(L);
   return 1;
 }

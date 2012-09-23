@@ -5,4 +5,6 @@
  
 int luaopen_cornerstone(lua_State *L);
 
+int luaopen_string(lua_State *L);
+
 #endif _CORNERSTONE_H

@@ -3,5 +3,5 @@ cmake_minimum_required(VERSION 2.6)
 include(dist.cmake)
 include(checkit.cmake)
 
-install_lua_module(cornerstone src/cornerstone.c)
+install_lua_module(cornerstone src/cornerstone.c src/string.c)
 add_checkit_test(test/*.lua)
