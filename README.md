@@ -1,7 +1,11 @@
 # Lua cornerstone library
 
-* be minimalistic
-* not object-oriented
+This is a basic library for Lua.
+
+I'd like to implement these modules.
+* cornerstone.string
+* cornerstone.iterator
+* cornerstone.time
 
 ## Build and test
 
