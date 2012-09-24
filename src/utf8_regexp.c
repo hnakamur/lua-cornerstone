@@ -99,7 +99,7 @@ static int regexp_match(lua_State *L) {
   cs_regexp_t *regexp = (cs_regexp_t *)luaL_checkudata(L, 1, RE_MTBL_NAME);
   size_t subject_len;
   const char *subject = luaL_checklstring(L, 2, &subject_len);
-  int offset = 0;
+  int offset = luaL_optint(L, 3, 1);
   int options = 0;
 
   size_t ovector_len = (regexp->capture_cnt + 1) * 3;
@@ -107,8 +107,8 @@ static int regexp_match(lua_State *L) {
   if (!ovector)
     return luaL_error(L, "ENOMEM");
 
-  int rc = pcre_exec(regexp->re, regexp->extra, subject, subject_len, offset,
-      options, ovector, ovector_len);
+  int rc = pcre_exec(regexp->re, regexp->extra, subject, subject_len,
+      offset - 1, options, ovector, ovector_len);
   if (rc < 0) {
     free(ovector);
     return luaL_error(L, regexp_exec_errname(rc));

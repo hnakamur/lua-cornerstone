@@ -12,6 +12,18 @@ exports['regexp.match'] = function(test)
   test.done()
 end
 
+exports['regexp.match.offset'] = function(test)
+  local cs = require('cornerstone')
+  local RegExp = cs.utf8.RegExp
+  local re = RegExp.new('so...')
+  local mr = re:match('something is something', 2)
+  test.ok(mr)
+  test.equal(mr:captureCount(), 0)
+  test.equal(mr:first(0), 14)
+  test.equal(mr:last(), 18)
+  test.done()
+end
+
 exports['regexp.match.capture'] = function(test)
   local cs = require('cornerstone')
   local RegExp = cs.utf8.RegExp
