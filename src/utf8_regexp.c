@@ -20,6 +20,35 @@ typedef struct cs_matchres_s {
   int subject_ref;
 } cs_matchres_t;
 
+#define RE_NEW_OPTION_MAP(XX) \
+  XX(ANCHORED) \
+  XX(AUTO_CALLOUT) \
+  XX(BSR_ANYCRLF) \
+  XX(BSR_UNICODE) \
+  XX(CASELESS) \
+  XX(DOLLAR_ENDONLY) \
+  XX(DOTALL) \
+  XX(DUPNAMES) \
+  XX(EXTENDED) \
+  XX(EXTRA) \
+  XX(FIRSTLINE) \
+  XX(JAVASCRIPT_COMPAT) \
+  XX(MULTILINE) \
+  XX(NEWLINE_ANY) \
+  XX(NEWLINE_ANYCRLF) \
+  XX(NEWLINE_CR) \
+  XX(NEWLINE_CRLF) \
+  XX(NEWLINE_LF) \
+  XX(NO_AUTO_CAPTURE) \
+  XX(NO_UTF16_CHECK) \
+  XX(NO_UTF8_CHECK) \
+  XX(UCP) \
+  XX(UNGREEDY)
+
+#define RE_NEW_OPTION_GEN(name) \
+  lua_pushnumber(L, PCRE_##name); \
+  lua_setfield(L, -2, #name);
+
 static int regexp_new(lua_State *L) {
   const char *pattern = luaL_checkstring(L, 1);
   int options = luaL_optint(L, 2, 0);
@@ -200,6 +229,9 @@ int luaopen_cs_utf8_regexp(lua_State *L) {
 
   lua_createtable(L, 0, ARRAY_SIZE(re_functions) - 1);
   luaL_register(L, NULL, re_functions);
+
+  RE_NEW_OPTION_MAP(RE_NEW_OPTION_GEN);
+
   lua_setfield(L, -2, "RegExp");
 
   return 1;

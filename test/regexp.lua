@@ -24,6 +24,47 @@ exports['regexp.match.offset'] = function(test)
   test.done()
 end
 
+exports['regexp.match.reuse'] = function(test)
+  local cs = require('cornerstone')
+  local RegExp = cs.utf8.RegExp
+  local re = RegExp.new('so...')
+
+  local mr = re:match('something is something')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 0)
+  test.equal(mr:first(0), 1)
+  test.equal(mr:last(), 5)
+
+  mr = re:match('something is something', 2)
+  test.ok(mr)
+  test.equal(mr:captureCount(), 0)
+  test.equal(mr:first(0), 14)
+  test.equal(mr:last(), 18)
+
+  test.done()
+end
+
+exports['regexp.match.caseless'] = function(test)
+  local cs = require('cornerstone')
+  local RegExp = cs.utf8.RegExp
+
+  local re = RegExp.new('so...')
+  local mr = re:match('Something is something')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 0)
+  test.equal(mr:first(0), 14)
+  test.equal(mr:last(), 18)
+
+  re = RegExp.new('so...', RegExp.CASELESS)
+  mr = re:match('Something is something')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 0)
+  test.equal(mr:first(0), 1)
+  test.equal(mr:last(), 5)
+
+  test.done()
+end
+
 exports['regexp.match.capture'] = function(test)
   local cs = require('cornerstone')
   local RegExp = cs.utf8.RegExp
