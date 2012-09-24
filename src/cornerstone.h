@@ -5,4 +5,4 @@
  
 int luaopen_cornerstone(lua_State *L);
 
-#endif _CORNERSTONE_H
+#endif /* _CORNERSTONE_H */

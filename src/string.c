@@ -10,7 +10,7 @@ static int ends_with(lua_State *L) {
   lua_pushboolean(L, ret);
   return 1;
 }
- 
+
 static int index_of(lua_State *L) {
   size_t haystack_len;
   const char *haystack = luaL_checklstring(L, 1, &haystack_len);
@@ -88,8 +88,8 @@ static const struct luaL_Reg functions[] = {
   { NULL, NULL }
 };
 
-int luaopen_string(lua_State *L) {
-  lua_newtable(L);
+int luaopen_cs_string(lua_State *L) {
+  lua_createtable(L, 0, ARRAY_SIZE(functions) - 1);
   luaL_register(L, NULL, functions);
   lua_setfield(L, -2, "string");
   return 1;

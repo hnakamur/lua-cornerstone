@@ -170,28 +170,37 @@ static const struct luaL_Reg mr_methods[] = {
   { NULL, NULL }
 };
 
+static const struct luaL_Reg mr_functions[] = {
+  { NULL, NULL }
+};
+
 static const struct luaL_Reg re_methods[] = {
   { "__gc", regexp_gc },
   { "match", regexp_match },
   { NULL, NULL }
 };
 
-static const struct luaL_Reg functions[] = {
+static const struct luaL_Reg re_functions[] = {
   { "new", regexp_new },
   { NULL, NULL }
 };
 
-int luaopen_utf8_regexp(lua_State *L) {
+int luaopen_cs_utf8_regexp(lua_State *L) {
   luaL_newmetatable(L, MR_MTBL_NAME);
   luaL_register(L, NULL, mr_methods);
   lua_setfield(L, -1, "__index");
+
+  lua_createtable(L, 0, ARRAY_SIZE(mr_functions) - 1);
+  luaL_register(L, NULL, mr_functions);
+  lua_setfield(L, -2, "MatchResult");
 
   luaL_newmetatable(L, RE_MTBL_NAME);
   luaL_register(L, NULL, re_methods);
   lua_setfield(L, -1, "__index");
 
-  lua_createtable(L, 0, ARRAY_SIZE(functions) - 1);
-  luaL_register(L, NULL, functions);
+  lua_createtable(L, 0, ARRAY_SIZE(re_functions) - 1);
+  luaL_register(L, NULL, re_functions);
   lua_setfield(L, -2, "RegExp");
+
   return 1;
 }
