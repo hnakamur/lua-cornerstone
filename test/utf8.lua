@@ -1,5 +1,22 @@
 local exports = {}
 
+exports['utf8.char.ascii'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.char(97), 'a')
+  test.equal(utf8.char(97, 98), 'a', 'b')
+  test.equal(utf8.char())
+  test.done()
+end
+
+exports['utf8.char.hiragana'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.char(0x3042), '\227\129\130')
+  test.equal(utf8.char(0x3042, 0x3044), '\227\129\130', '\227\129\132')
+  test.done()
+end
+
 exports['utf8.codePoint.ascii'] = function(test)
   local cs = require('cornerstone')
   local utf8 = cs.utf8

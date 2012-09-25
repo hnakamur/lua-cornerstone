@@ -50,6 +50,46 @@ static int count_code_point(const char *s, size_t slen) {
   return n;
 }
 
+int utf8_char(lua_State *L) {
+  int arg_n = lua_gettop(L);
+  int arg_i;
+  luaL_Buffer buf;
+  for (arg_i = 1; arg_i <= arg_n; ++arg_i) {
+    unsigned cp = (unsigned)luaL_checkint(L, arg_i);
+    luaL_buffinit(L, &buf);
+    if (cp <= 0x7F) {
+      luaL_addchar(&buf, (char)cp);
+    } else if (cp <= 0x7FF) {
+      luaL_addchar(&buf, (char)(0xC0 | cp >> 6));
+      luaL_addchar(&buf, (char)(0x80 | cp & 0x3F));
+    } else if (cp <= 0xFFFF) {
+      luaL_addchar(&buf, (char)(0xE0 | cp >> 12));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 6) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | cp & 0x3F));
+    } else if (cp <= 0x1FFFFF) {
+      luaL_addchar(&buf, (char)(0xF0 | cp >> 18));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 12) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 6) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | cp & 0x3F));
+    } else if (cp <= 0x3FFFFFF) {
+      luaL_addchar(&buf, (char)(0xF8 | cp >> 24));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 18) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 12) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 6) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | cp & 0x3F));
+    } else if (cp <= 0x7FFFFFFF) {
+      luaL_addchar(&buf, (char)(0xFC | cp >> 30));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 24) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 18) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 12) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | (cp >> 6) & 0x3F));
+      luaL_addchar(&buf, (char)(0x80 | cp & 0x3F));
+    }
+    luaL_pushresult(&buf);
+  }
+  return arg_n;
+}
+
 int utf8_code_point(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
@@ -92,6 +132,7 @@ int utf8_code_point(lua_State *L) {
 }
 
 static const struct luaL_Reg functions[] = {
+  { "char", utf8_char },
   { "codePoint", utf8_code_point },
   { NULL, NULL }
 };
