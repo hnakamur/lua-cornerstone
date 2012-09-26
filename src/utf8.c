@@ -95,13 +95,16 @@ int utf8_code_point(lua_State *L) {
   const char *str = luaL_checklstring(L, 1, &str_len);
   int first = luaL_optint(L, 2, 1);
   int last = luaL_optint(L, 3, first);
-  int cp_cnt = count_code_point(str, str_len);
+  int cp_cnt;
   const char *str_end = str + str_len;
   const char *p = str;
   int cp_len;
   int i;
   int ret_cnt = 0;
 
+  if (first < 0 || last < 0) {
+    cp_cnt = count_code_point(str, str_len);
+  }
   if (first < 0) {
     first = cp_cnt + first + 1;
   }
