@@ -10,6 +10,9 @@ int luaopen_cs_string(lua_State *L);
 int luaopen_cs_utf8(lua_State *L);
 int luaopen_cs_utf8_regexp(lua_State *L);
 
+int ends_with(lua_State *L);
+int starts_with(lua_State *L);
+
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 #define ERRNAME_FUNC_BODY(errcode, map, gen, def) \

@@ -55,6 +55,15 @@ static int count_code_point(const char *s, size_t slen) {
   return n;
 }
 
+static int to_byte_position(const char *s, unsigned index) {
+  const char *p = s;
+  unsigned i;
+  for (i = 1; i < index; ++i) {
+    p += get_code_point_byte_len(p);
+  }
+  return p - s + 1;
+}
+
 int utf8_char(lua_State *L) {
   int arg_n = lua_gettop(L);
   int arg_i;
@@ -139,6 +148,81 @@ int utf8_code_point(lua_State *L) {
   return ret_cnt;
 }
 
+static int utf8_index_of(lua_State *L) {
+  size_t haystack_len;
+  const char *haystack = luaL_checklstring(L, 1, &haystack_len);
+  size_t needle_len;
+  const char *needle = luaL_checklstring(L, 2, &needle_len);
+  int position = luaL_optint(L, 3, 1);
+  int cp_len;
+  int cp_cnt = count_code_point(haystack, haystack_len);
+  int byte_pos;
+
+  if (position < 0) {
+    position = cp_cnt + position + 1;
+  }
+
+  if (needle_len == 0) {
+    lua_pushnumber(L, position);
+    return 1;
+  }
+
+  if (position > cp_cnt)
+    goto error;
+  byte_pos = to_byte_position(haystack, position);
+  const char *p = (const char *)memmem(&haystack[byte_pos - 1], haystack_len,
+      needle, needle_len);
+  if (!p)
+    goto error;
+  lua_pushnumber(L, count_code_point(haystack, p - haystack) + 1);
+
+  return 1;
+
+error:
+  lua_pushnil(L);
+  return 1;
+}
+ 
+static int utf8_last_index_of(lua_State *L) {
+  size_t haystack_len;
+  const char *haystack = luaL_checklstring(L, 1, &haystack_len);
+  size_t needle_len;
+  const char *needle = luaL_checklstring(L, 2, &needle_len);
+  int position = luaL_optint(L, 3, -1);
+  int last_char;
+  const char *p;
+  size_t n;
+  int byte_pos;
+
+  int cp_cnt = count_code_point(haystack, haystack_len);
+  if (position < 0) {
+    position = cp_cnt + position + 1;
+  }
+
+  if (needle_len == 0) {
+    lua_pushnumber(L, position);
+    return 1;
+  }
+
+  if (position > cp_cnt)
+    goto error;
+  last_char = needle[needle_len - 1];
+  byte_pos = to_byte_position(haystack, position);
+  for (p = &haystack[byte_pos - 1]; p >= &haystack[needle_len - 1]; --p) {
+    if (*p != last_char)
+      continue;
+    const char *start = p - needle_len + 1;
+    if (memcmp(start, needle, needle_len) == 0) {
+      lua_pushnumber(L, count_code_point(haystack, start - haystack) + 1);
+      return 1;
+    }
+  }
+
+error:
+  lua_pushnil(L);
+  return 1;
+}
+
 int utf8_len(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
@@ -213,8 +297,12 @@ int utf8_sub(lua_State *L) {
 static const struct luaL_Reg functions[] = {
   { "char", utf8_char },
   { "codePoint", utf8_code_point },
+  { "endsWith", ends_with },
+  { "indexOf", utf8_index_of },
+  { "lastIndexOf", utf8_last_index_of },
   { "len", utf8_len },
   { "reverse", utf8_reverse },
+  { "startsWith", starts_with },
   { "sub", utf8_sub },
   { NULL, NULL }
 };

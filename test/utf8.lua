@@ -135,4 +135,60 @@ exports['utf8.sub.hiragana'] = function(test)
   test.done()
 end
 
+exports['utf8.endsWith'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.ok(utf8.endsWith('hello.txt', '.txt'))
+  test.ok(not utf8.endsWith('hello.txt', '.md'))
+  test.ok(utf8.endsWith('hello', ''))
+  test.ok(utf8.endsWith('', ''))
+  test.ok(not utf8.endsWith('', 'no'))
+  test.done()
+end
+
+exports['utf8.indexOf'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.indexOf('hello.txt', 'he'), 1)
+  test.equal(utf8.indexOf('hello.txt', '.'), 6)
+  test.equal(utf8.indexOf('hello.txt', ''), 1)
+  test.equal(utf8.indexOf('hello.txt', '', 4), 4)
+  test.equal(utf8.indexOf('hello.txt', 'll', 4), nil)
+  test.equal(utf8.indexOf('hello.txt', 'no'), nil)
+  test.equal(utf8.indexOf('cornerstone', 'r', 4), 6)
+  test.equal(utf8.indexOf('hello.txt', 'he', 10), nil)
+  test.equal(utf8.indexOf('\227\129\130\227\129\132\227\129\134',
+      '\227\129\132'), 2)
+  test.equal(utf8.indexOf('\227\129\130\227\129\132\227\129\132\227\129\134',
+      '\227\129\132', 3), 3)
+  test.done()
+end
+
+exports['utf8.lastIndexOf'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.lastIndexOf('cornerstone', 'e'), 11)
+  test.equal(utf8.lastIndexOf('cornerstone', 'x'), nil)
+  test.equal(utf8.lastIndexOf('cornerstone', 'o'), 9)
+  test.equal(utf8.lastIndexOf('cornerstone', 'o', 5), 2)
+  test.equal(utf8.lastIndexOf('cornerstone', 'n', 3), nil)
+  test.equal(utf8.lastIndexOf('cornerstone', ''), 11)
+  test.equal(utf8.lastIndexOf('cornerstone', 'co'), 1)
+  test.equal(utf8.lastIndexOf(
+      '\227\129\130\227\129\132\227\129\132\227\129\134',
+      '\227\129\132'), 3)
+  test.done()
+end
+
+exports['utf8.startsWith'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.ok(utf8.startsWith('hello', 'he'))
+  test.ok(not utf8.startsWith('hello', 'she'))
+  test.ok(utf8.startsWith('hello', ''))
+  test.ok(utf8.startsWith('', ''))
+  test.ok(not utf8.startsWith('', 'no'))
+  test.done()
+end
+
 return exports

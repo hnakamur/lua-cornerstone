@@ -1,6 +1,6 @@
 #include "cornerstone-priv.h"
  
-static int ends_with(lua_State *L) {
+int ends_with(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
   size_t suffix_len;
@@ -69,7 +69,7 @@ error:
   return 1;
 }
  
-static int starts_with(lua_State *L) {
+int starts_with(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
   size_t prefix_len;
