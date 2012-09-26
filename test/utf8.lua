@@ -17,6 +17,13 @@ exports['utf8.char.hiragana'] = function(test)
   test.done()
 end
 
+exports['utf8.char.surrogate_pair'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.char(0x2000B), '\240\160\128\139')
+  test.done()
+end
+
 exports['utf8.codePoint.ascii'] = function(test)
   local cs = require('cornerstone')
   local utf8 = cs.utf8
@@ -47,6 +54,13 @@ exports['utf8.codePoint.hiragana'] = function(test)
   test.equal(utf8.codePoint('\227\129\130\227\129\132', 3))
   test.equal(utf8.codePoint('\227\129\130\227\129\132', -2), 0x3042)
   test.equal(utf8.codePoint('\227\129\130\227\129\132', -1), 0x3044)
+  test.done()
+end
+
+exports['utf8.codePoint.surrogate_pair'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.codePoint('\240\160\128\139'), 0x2000B)
   test.done()
 end
 
