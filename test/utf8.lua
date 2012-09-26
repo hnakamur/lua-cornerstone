@@ -88,4 +88,38 @@ exports['utf8.len.hiragana'] = function(test)
   test.done()
 end
 
+exports['utf8.sub.ascii'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  local string = require('string')
+  test.equal(utf8.sub('abc', 1, 2), 'ab')
+  test.equal(utf8.sub('abc', 2), 'bc')
+  test.equal(utf8.sub('abc', -1), 'c')
+  test.equal(utf8.sub('abc', -2, -1), 'bc')
+
+  test.equal(utf8.sub('abc', 4), '')
+  test.equal(utf8.sub('abc', 3, 2), '')
+
+  test.done()
+end
+
+exports['utf8.sub.hiragana'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  local string = require('string')
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 1, 2),
+      '\227\129\130\227\129\132')
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 2),
+      '\227\129\132\227\129\134')
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', -1),
+      '\227\129\134')
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', -2, -1), 
+      '\227\129\132\227\129\134')
+
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 4), '')
+  test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 3, 2), '')
+
+  test.done()
+end
+
 return exports

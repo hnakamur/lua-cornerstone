@@ -142,10 +142,55 @@ int utf8_len(lua_State *L) {
   return 1;
 }
 
+int utf8_sub(lua_State *L) {
+  size_t str_len;
+  const char *str = luaL_checklstring(L, 1, &str_len);
+  int first = luaL_optint(L, 2, 1);
+  int last = luaL_optint(L, 3, -1);
+  int cp_cnt;
+  const char *str_end = str + str_len;
+  const char *p = str;
+  int cp_len;
+  int i;
+  int j;
+  luaL_Buffer buf;
+
+  if (first < 0 || last < 0) {
+    cp_cnt = count_code_point(str, str_len);
+  }
+  if (first < 0) {
+    first = cp_cnt + first + 1;
+  }
+  if (last < 0) {
+    last = cp_cnt + last + 1;
+  }
+
+  for (i = 1; i < first; ++i) {
+    p += get_code_point_byte_len(p);
+  }
+
+  luaL_buffinit(L, &buf);
+  for (i = first; i <= last; ++i) {
+    int cp_len = get_code_point_byte_len(p);
+    if (p < str) {
+      continue;
+    }
+    if (p + cp_len > str_end) {
+      break;
+    }
+    for (j = 0; j < cp_len; ++j, ++p) {
+      luaL_addchar(&buf, *p);
+    }
+  }
+  luaL_pushresult(&buf);
+  return 1;
+}
+
 static const struct luaL_Reg functions[] = {
   { "char", utf8_char },
   { "codePoint", utf8_code_point },
   { "len", utf8_len },
+  { "sub", utf8_sub },
   { NULL, NULL }
 };
 
