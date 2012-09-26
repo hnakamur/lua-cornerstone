@@ -50,4 +50,28 @@ exports['utf8.codePoint.hiragana'] = function(test)
   test.done()
 end
 
+exports['utf8.len.ascii'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.len('a'), 1)
+  test.equal(utf8.len('ab'), 2)
+  test.equal(utf8.char())
+  test.done()
+end
+
+exports['utf8.len.empty'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.len(''), 0)
+  test.done()
+end
+
+exports['utf8.len.hiragana'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.len('\227\129\130'), 1)
+  test.equal(utf8.len('\227\129\130\227\129\132'), 2)
+  test.done()
+end
+
 return exports

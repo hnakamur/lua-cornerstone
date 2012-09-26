@@ -131,9 +131,18 @@ int utf8_code_point(lua_State *L) {
   return ret_cnt;
 }
 
+int utf8_len(lua_State *L) {
+  size_t str_len;
+  const char *str = luaL_checklstring(L, 1, &str_len);
+  int cnt = *str == '\0' ? 0 : count_code_point(str, str_len);
+  lua_pushnumber(L, cnt);
+  return 1;
+}
+
 static const struct luaL_Reg functions[] = {
   { "char", utf8_char },
   { "codePoint", utf8_code_point },
+  { "len", utf8_len },
   { NULL, NULL }
 };
 
