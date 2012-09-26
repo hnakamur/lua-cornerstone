@@ -88,10 +88,24 @@ exports['utf8.len.hiragana'] = function(test)
   test.done()
 end
 
+exports['utf8.reverse.ascii'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.reverse('abc'), 'cba')
+  test.done()
+end
+
+exports['utf8.reverse.hiragana'] = function(test)
+  local cs = require('cornerstone')
+  local utf8 = cs.utf8
+  test.equal(utf8.reverse('\227\129\130\227\129\132\227\129\134'),
+      '\227\129\134\227\129\132\227\129\130')
+  test.done()
+end
+
 exports['utf8.sub.ascii'] = function(test)
   local cs = require('cornerstone')
   local utf8 = cs.utf8
-  local string = require('string')
   test.equal(utf8.sub('abc', 1, 2), 'ab')
   test.equal(utf8.sub('abc', 2), 'bc')
   test.equal(utf8.sub('abc', -1), 'c')
@@ -106,7 +120,6 @@ end
 exports['utf8.sub.hiragana'] = function(test)
   local cs = require('cornerstone')
   local utf8 = cs.utf8
-  local string = require('string')
   test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 1, 2),
       '\227\129\130\227\129\132')
   test.equal(utf8.sub('\227\129\130\227\129\132\227\129\134', 2),

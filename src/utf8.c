@@ -1,7 +1,12 @@
 #include "cornerstone-priv.h"
 
+typedef unsigned char uchar;
+
+#define UTF8_IS_HEAD_BYTE(bptr) (((*(const uchar *)bptr) & 0xC0) != 0x80)
+#define UTF8_IS_TAIL_BYTE(bptr) (((*(const uchar *)bptr) & 0xC0) == 0x80)
+
 static int get_code_point_byte_len(const char *lead) {
-  int byte = *(const unsigned char *)lead;
+  int byte = *(const uchar *)lead;
   if (byte <= 0x7F) {
     return 1;
   } else if (byte <= 0xDF) {
@@ -20,7 +25,7 @@ static int get_code_point_byte_len(const char *lead) {
 }
 
 static int get_code_point(const char *s) {
-  const unsigned char *u = (const unsigned char *)s;
+  const uchar *u = (const uchar *)s;
   if (u[0] <= 0x7F) {
     return u[0];
   } else if (u[0] <= 0xDF) {
@@ -142,6 +147,25 @@ int utf8_len(lua_State *L) {
   return 1;
 }
 
+int utf8_reverse(lua_State *L) {
+  size_t str_len;
+  const char *str = luaL_checklstring(L, 1, &str_len);
+  const char *p;
+  const char *q;
+  const char *s;
+  luaL_Buffer buf;
+
+  luaL_buffinit(L, &buf);
+  for (q = str + str_len; q > str; q = p) {
+    for (p = q - 1; UTF8_IS_TAIL_BYTE(p) && p >= str; --p);
+    for (s = p; s < q; ++s) {
+      luaL_addchar(&buf, *s);
+    }
+  }
+  luaL_pushresult(&buf);
+  return 1;
+}
+
 int utf8_sub(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
@@ -190,6 +214,7 @@ static const struct luaL_Reg functions[] = {
   { "char", utf8_char },
   { "codePoint", utf8_code_point },
   { "len", utf8_len },
+  { "reverse", utf8_reverse },
   { "sub", utf8_sub },
   { NULL, NULL }
 };
