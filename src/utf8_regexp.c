@@ -224,7 +224,21 @@ static int matchres_last(lua_State *L) {
 
 static int matchres_group(lua_State *L) {
   cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
-  int group = luaL_optint(L, 2, 0);
+  int group_type = lua_type(L, 2);
+  int group;
+  if (group_type == LUA_TNUMBER) {
+    group = luaL_optint(L, 2, 0);
+  } else if (group_type == LUA_TSTRING) {
+    const char *group_name = luaL_checkstring(L, 2);
+    group = pcre_get_stringnumber(mr->regexp->re, group_name);
+    if (group < 0) {
+      return luaL_error(L, regexp_exec_errname(group));
+    }
+  } else if (group_type == LUA_TNIL || group_type == LUA_TNONE) {
+    group = 0;
+  } else {
+    return luaL_error(L, "must be number or string.");
+  }
   int first_byte_pos = mr->ovector[group * 2] + 1;
   int last_byte_pos = mr->ovector[group * 2 + 1];
   luaL_Buffer buf;

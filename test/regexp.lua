@@ -81,6 +81,18 @@ exports['regexp.match.capture'] = function(test)
   test.done()
 end
 
+exports['regexp.match.capture.name'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(?<given>\w+) (?<family>\w+)]])
+  local mr = re:match('Roberto Ierusalimschy')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 2)
+  test.equal(mr:group('given'), 'Roberto')
+  test.equal(mr:group('family'), 'Ierusalimschy')
+  test.done()
+end
+
 exports['regexp.match.utf8'] = function(test)
   local cs = require('cornerstone')
   local regexp = cs.utf8.regexp
