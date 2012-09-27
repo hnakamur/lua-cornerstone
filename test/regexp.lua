@@ -103,6 +103,16 @@ exports['regexp.match.word'] = function(test)
   test.done()
 end
 
+exports['regexp.match.no_match'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('(\w+) (\w+)') -- Oops, forgot to escape.
+  local mr, err = re:match('Isaac Newton, physicist')
+  test.is_nil(mr)
+  test.equal(err, 'NOMATCH')
+  test.done()
+end
+
 exports['regexp.match.group'] = function(test)
   local cs = require('cornerstone')
   local regexp = cs.utf8.regexp

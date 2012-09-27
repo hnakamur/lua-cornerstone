@@ -141,7 +141,9 @@ static int regexp_match(lua_State *L) {
       offset - 1, options, ovector, ovector_len);
   if (rc < 0) {
     free(ovector);
-    return luaL_error(L, regexp_exec_errname(rc));
+    lua_pushnil(L);
+    lua_pushstring(L, regexp_exec_errname(rc));
+    return 2;
   }
 
   cs_matchres_t *mr = lua_newuserdata(L, sizeof(cs_matchres_t));
