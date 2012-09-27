@@ -46,7 +46,7 @@ static int get_code_point(const char *s) {
   }
 }
 
-static int count_code_point(const char *s, size_t slen) {
+int cs_utf8_count_code_point(const char *s, size_t slen) {
   const char *send = s + slen;
   int n = 0;
   for (; s < send; s += get_code_point_byte_len(s)) {
@@ -117,7 +117,7 @@ int utf8_code_point(lua_State *L) {
   int ret_cnt = 0;
 
   if (first < 0 || last < 0) {
-    cp_cnt = count_code_point(str, str_len);
+    cp_cnt = cs_utf8_count_code_point(str, str_len);
   }
   if (first < 0) {
     first = cp_cnt + first + 1;
@@ -155,7 +155,7 @@ static int utf8_index_of(lua_State *L) {
   const char *needle = luaL_checklstring(L, 2, &needle_len);
   int position = luaL_optint(L, 3, 1);
   int cp_len;
-  int cp_cnt = count_code_point(haystack, haystack_len);
+  int cp_cnt = cs_utf8_count_code_point(haystack, haystack_len);
   int byte_pos;
 
   if (position < 0) {
@@ -174,7 +174,7 @@ static int utf8_index_of(lua_State *L) {
       needle, needle_len);
   if (!p)
     goto error;
-  lua_pushnumber(L, count_code_point(haystack, p - haystack) + 1);
+  lua_pushnumber(L, cs_utf8_count_code_point(haystack, p - haystack) + 1);
 
   return 1;
 
@@ -194,7 +194,7 @@ static int utf8_last_index_of(lua_State *L) {
   size_t n;
   int byte_pos;
 
-  int cp_cnt = count_code_point(haystack, haystack_len);
+  int cp_cnt = cs_utf8_count_code_point(haystack, haystack_len);
   if (position < 0) {
     position = cp_cnt + position + 1;
   }
@@ -213,7 +213,7 @@ static int utf8_last_index_of(lua_State *L) {
       continue;
     const char *start = p - needle_len + 1;
     if (memcmp(start, needle, needle_len) == 0) {
-      lua_pushnumber(L, count_code_point(haystack, start - haystack) + 1);
+      lua_pushnumber(L, cs_utf8_count_code_point(haystack, start - haystack) + 1);
       return 1;
     }
   }
@@ -226,7 +226,7 @@ error:
 int utf8_len(lua_State *L) {
   size_t str_len;
   const char *str = luaL_checklstring(L, 1, &str_len);
-  int cnt = *str == '\0' ? 0 : count_code_point(str, str_len);
+  int cnt = *str == '\0' ? 0 : cs_utf8_count_code_point(str, str_len);
   lua_pushnumber(L, cnt);
   return 1;
 }
@@ -258,7 +258,7 @@ void cs_utf8_sub(const char *str, size_t str_len, int first, int last,
   int i;
 
   if (first < 0 || last < 0) {
-    cp_cnt = count_code_point(str, str_len);
+    cp_cnt = cs_utf8_count_code_point(str, str_len);
   }
   if (first < 0) {
     first = cp_cnt + first + 1;

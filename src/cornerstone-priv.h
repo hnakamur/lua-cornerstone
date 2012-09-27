@@ -10,6 +10,7 @@ int luaopen_cs_string(lua_State *L);
 int luaopen_cs_utf8(lua_State *L);
 int luaopen_cs_utf8_regexp(lua_State *L);
 
+int cs_utf8_count_code_point(const char *s, size_t slen);
 void cs_utf8_sub(const char *str, size_t str_len, int first, int last,
     const char **sub, size_t *sub_len);
 void cs_utf8_push_sub(lua_State *L, const char *str, size_t str_len, int first,

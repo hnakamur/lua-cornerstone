@@ -52,7 +52,7 @@ typedef struct cs_matchres_s {
 
 static int regexp_compile(lua_State *L) {
   const char *pattern = luaL_checkstring(L, 1);
-  int options = luaL_optint(L, 2, 0);
+  int options = luaL_optint(L, 2, 0) | PCRE_UTF8;
   int err_code;
   const char *err_text;
   int err_offset;
@@ -207,23 +207,32 @@ static int matchres_capture_count(lua_State *L) {
 static int matchres_first(lua_State *L) {
   cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
   int group = luaL_optint(L, 2, 0);
-  lua_pushnumber(L, mr->ovector[group * 2] + 1);
+  int byte_pos = mr->ovector[group * 2];
+  int first = cs_utf8_count_code_point(mr->subject, byte_pos) + 1;
+  lua_pushnumber(L, first);
   return 1;
 }
 
 static int matchres_last(lua_State *L) {
   cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
   int group = luaL_optint(L, 2, 0);
-  lua_pushnumber(L, mr->ovector[group * 2 + 1]);
+  int byte_pos = mr->ovector[group * 2 + 1];
+  int last = cs_utf8_count_code_point(mr->subject, byte_pos);
+  lua_pushnumber(L, last);
   return 1;
 }
 
 static int matchres_group(lua_State *L) {
   cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
   int group = luaL_optint(L, 2, 0);
-  int first = mr->ovector[group * 2] + 1;
-  int last = mr->ovector[group * 2 + 1];
-  cs_utf8_push_sub(L, mr->subject, mr->subject_len, first, last);
+  int first_byte_pos = mr->ovector[group * 2] + 1;
+  int last_byte_pos = mr->ovector[group * 2 + 1];
+  luaL_Buffer buf;
+
+  luaL_buffinit(L, &buf);
+  luaL_addlstring(&buf, mr->subject + first_byte_pos - 1,
+      last_byte_pos - first_byte_pos + 1);
+  luaL_pushresult(&buf);
   return 1;
 }
 
