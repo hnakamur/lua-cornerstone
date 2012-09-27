@@ -93,6 +93,32 @@ exports['regexp.match.capture.name'] = function(test)
   test.done()
 end
 
+exports['regexp.match.capture.no_such_name'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(?<given>\w+) (?<family>\w+)?]])
+  local mr = re:match('Roberto ')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 1)
+  test.equal(mr:group('given'), 'Roberto')
+  test.equal(mr:group('family'), '')
+  test.done()
+end
+
+exports['regexp.match.capture.no_such_name_case2'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(?<given>\w+) (?<family>\w+)?]])
+  local mr = re:match('Roberto Ierusalimschy')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 2)
+  test.equal(mr:group('given'), 'Roberto')
+  succeeded, err = pcall(mr.group, mr, 'middle')
+  test.ok(not succeeded)
+  test.equal(err, 'NOSUBSTRING')
+  test.done()
+end
+
 exports['regexp.match.utf8'] = function(test)
   local cs = require('cornerstone')
   local regexp = cs.utf8.regexp
