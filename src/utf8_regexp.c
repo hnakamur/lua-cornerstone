@@ -125,6 +125,29 @@ static const char *regexp_exec_errname(int errcode) {
       "UNKOWN_ERR_CODE")
 }
 
+static int regexp_does_match(lua_State *L) {
+  cs_regexp_t *regexp = (cs_regexp_t *)luaL_checkudata(L, 1, RE_MTBL_NAME);
+  size_t subject_len;
+  const char *subject = luaL_checklstring(L, 2, &subject_len);
+  int offset = luaL_optint(L, 3, 1);
+  int options = 0;
+
+  size_t ovector_len = (regexp->capture_cnt + 1) * 3;
+  int *ovector = (int *)calloc(ovector_len, sizeof(int));
+  if (!ovector)
+    return luaL_error(L, "ENOMEM");
+
+  int rc = pcre_exec(regexp->re, regexp->extra, subject, subject_len,
+      offset - 1, options, ovector, ovector_len);
+  free(ovector);
+  if (rc < PCRE_ERROR_NOMATCH) {
+    return luaL_error(L, regexp_exec_errname(rc));
+  }
+
+  lua_pushboolean(L, rc != PCRE_ERROR_NOMATCH);
+  return 1;
+}
+
 static int regexp_match(lua_State *L) {
   cs_regexp_t *regexp = (cs_regexp_t *)luaL_checkudata(L, 1, RE_MTBL_NAME);
   size_t subject_len;
@@ -219,6 +242,7 @@ static const struct luaL_Reg mr_functions[] = {
 
 static const struct luaL_Reg re_methods[] = {
   { "__gc", regexp_gc },
+  { "doesMatch", regexp_does_match },
   { "match", regexp_match },
   { NULL, NULL }
 };

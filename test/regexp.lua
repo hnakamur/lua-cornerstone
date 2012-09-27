@@ -125,4 +125,13 @@ exports['regexp.match.group'] = function(test)
   test.done()
 end
 
+exports['regexp.match.does_match'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(\w+) (\w+)]])
+  test.ok(re:doesMatch('Isaac Newton, physicist'))
+  test.ok(not re:doesMatch('Isaac'))
+  test.done()
+end
+
 return exports
