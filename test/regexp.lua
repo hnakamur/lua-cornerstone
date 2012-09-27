@@ -93,4 +93,26 @@ exports['regexp.match.utf8'] = function(test)
   test.done()
 end
 
+exports['regexp.match.word'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[\w+]])
+  local mr = re:match('Isaac Newton, physicist')
+  test.ok(mr)
+  test.equal(mr:group(0), 'Isaac')
+  test.done()
+end
+
+exports['regexp.match.group'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(\w+) (\w+)]])
+  local mr = re:match('Isaac Newton, physicist')
+  test.ok(mr)
+  test.equal(mr:group(0), 'Isaac Newton')
+  test.equal(mr:group(1), 'Isaac')
+  test.equal(mr:group(2), 'Newton')
+  test.done()
+end
+
 return exports

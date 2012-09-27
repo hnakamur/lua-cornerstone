@@ -12,6 +12,9 @@ int luaopen_cs_utf8_regexp(lua_State *L);
 
 void cs_utf8_sub(const char *str, size_t str_len, int first, int last,
     const char **sub, size_t *sub_len);
+void cs_utf8_push_sub(lua_State *L, const char *str, size_t str_len, int first,
+    int last);
+
 int ends_with(lua_State *L);
 int starts_with(lua_State *L);
 

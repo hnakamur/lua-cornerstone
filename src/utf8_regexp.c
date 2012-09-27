@@ -16,6 +16,7 @@ typedef struct cs_matchres_s {
   int *ovector;
   cs_regexp_t *regexp;
   int regexp_ref;
+  size_t subject_len;
   const char *subject;
   int subject_ref;
 } cs_matchres_t;
@@ -156,6 +157,7 @@ static int regexp_match(lua_State *L) {
   lua_pushvalue(L, 1);
   mr->regexp_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
+  mr->subject_len = subject_len;
   mr->subject = subject;
   lua_pushvalue(L, 2);
   mr->subject_ref = luaL_ref(L, LUA_REGISTRYINDEX);
@@ -191,10 +193,20 @@ static int matchres_last(lua_State *L) {
   return 1;
 }
 
+static int matchres_group(lua_State *L) {
+  cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
+  int group = luaL_optint(L, 2, 0);
+  int first = mr->ovector[group * 2] + 1;
+  int last = mr->ovector[group * 2 + 1];
+  cs_utf8_push_sub(L, mr->subject, mr->subject_len, first, last);
+  return 1;
+}
+
 static const struct luaL_Reg mr_methods[] = {
   { "__gc", matchres_gc },
   { "captureCount", matchres_capture_count },
   { "first", matchres_first },
+  { "group", matchres_group },
   { "last", matchres_last },
   { NULL, NULL }
 };

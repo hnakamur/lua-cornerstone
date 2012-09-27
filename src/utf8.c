@@ -288,11 +288,8 @@ void cs_utf8_sub(const char *str, size_t str_len, int first, int last,
   *sub_len = *sub ? p - *sub : 0;
 }
 
-int utf8_sub(lua_State *L) {
-  size_t str_len;
-  const char *str = luaL_checklstring(L, 1, &str_len);
-  int first = luaL_optint(L, 2, 1);
-  int last = luaL_optint(L, 3, -1);
+void cs_utf8_push_sub(lua_State *L, const char *str, size_t str_len, int first,
+    int last) {
   const char *sub;
   size_t sub_len;
   luaL_Buffer buf;
@@ -301,6 +298,14 @@ int utf8_sub(lua_State *L) {
   luaL_buffinit(L, &buf);
   luaL_addlstring(&buf, sub, sub_len);
   luaL_pushresult(&buf);
+}
+
+int utf8_sub(lua_State *L) {
+  size_t str_len;
+  const char *str = luaL_checklstring(L, 1, &str_len);
+  int first = luaL_optint(L, 2, 1);
+  int last = luaL_optint(L, 3, -1);
+  cs_utf8_push_sub(L, str, str_len, first, last);
   return 1;
 }
 
