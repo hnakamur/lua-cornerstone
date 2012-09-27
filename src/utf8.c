@@ -250,18 +250,12 @@ int utf8_reverse(lua_State *L) {
   return 1;
 }
 
-int utf8_sub(lua_State *L) {
-  size_t str_len;
-  const char *str = luaL_checklstring(L, 1, &str_len);
-  int first = luaL_optint(L, 2, 1);
-  int last = luaL_optint(L, 3, -1);
+void cs_utf8_sub(const char *str, size_t str_len, int first, int last,
+    const char **sub, size_t *sub_len) {
   int cp_cnt;
-  const char *str_end = str + str_len;
   const char *p = str;
-  int cp_len;
+  const char *str_end = str + str_len;
   int i;
-  int j;
-  luaL_Buffer buf;
 
   if (first < 0 || last < 0) {
     cp_cnt = count_code_point(str, str_len);
@@ -277,19 +271,35 @@ int utf8_sub(lua_State *L) {
     p += get_code_point_byte_len(p);
   }
 
-  luaL_buffinit(L, &buf);
+  *sub = NULL;
   for (i = first; i <= last; ++i) {
     int cp_len = get_code_point_byte_len(p);
     if (p < str) {
       continue;
     }
+    if (!*sub) {
+      *sub = p;
+    }
     if (p + cp_len > str_end) {
       break;
     }
-    for (j = 0; j < cp_len; ++j, ++p) {
-      luaL_addchar(&buf, *p);
-    }
+    p += cp_len;
   }
+  *sub_len = *sub ? p - *sub : 0;
+}
+
+int utf8_sub(lua_State *L) {
+  size_t str_len;
+  const char *str = luaL_checklstring(L, 1, &str_len);
+  int first = luaL_optint(L, 2, 1);
+  int last = luaL_optint(L, 3, -1);
+  const char *sub;
+  size_t sub_len;
+  luaL_Buffer buf;
+
+  cs_utf8_sub(str, str_len, first, last, &sub, &sub_len);
+  luaL_buffinit(L, &buf);
+  luaL_addlstring(&buf, sub, sub_len);
   luaL_pushresult(&buf);
   return 1;
 }
