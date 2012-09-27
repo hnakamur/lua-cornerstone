@@ -2,8 +2,8 @@ local exports = {}
 
 exports['regexp.match'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
-  local re = RegExp.new('so...')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('so...')
   local mr = re:match('something is something')
   test.ok(mr)
   test.equal(mr:captureCount(), 0)
@@ -14,8 +14,8 @@ end
 
 exports['regexp.match.offset'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
-  local re = RegExp.new('so...')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('so...')
   local mr = re:match('something is something', 2)
   test.ok(mr)
   test.equal(mr:captureCount(), 0)
@@ -26,8 +26,8 @@ end
 
 exports['regexp.match.reuse'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
-  local re = RegExp.new('so...')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('so...')
 
   local mr = re:match('something is something')
   test.ok(mr)
@@ -46,16 +46,16 @@ end
 
 exports['regexp.match.caseless'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
+  local regexp = cs.utf8.regexp
 
-  local re = RegExp.new('so...')
+  local re = regexp.compile('so...')
   local mr = re:match('Something is something')
   test.ok(mr)
   test.equal(mr:captureCount(), 0)
   test.equal(mr:first(0), 14)
   test.equal(mr:last(), 18)
 
-  re = RegExp.new('so...', RegExp.CASELESS)
+  re = regexp.compile('so...', regexp.CASELESS)
   mr = re:match('Something is something')
   test.ok(mr)
   test.equal(mr:captureCount(), 0)
@@ -67,8 +67,8 @@ end
 
 exports['regexp.match.capture'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
-  local re = RegExp.new('([^:]+):\\s+(.*)')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('([^:]+):\\s+(.*)')
   local mr = re:match('Connection: close')
   test.ok(mr)
   test.equal(mr:captureCount(), 2)
@@ -83,8 +83,8 @@ end
 
 exports['regexp.match.utf8'] = function(test)
   local cs = require('cornerstone')
-  local RegExp = cs.utf8.RegExp
-  local re = RegExp.new('..')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile('..')
   local mr = re:match('\227\129\130\227\129\132')
   test.ok(mr)
   test.equal(mr:captureCount(), 0)

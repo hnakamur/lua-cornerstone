@@ -49,7 +49,7 @@ typedef struct cs_matchres_s {
   lua_pushnumber(L, PCRE_##name); \
   lua_setfield(L, -2, #name);
 
-static int regexp_new(lua_State *L) {
+static int regexp_compile(lua_State *L) {
   const char *pattern = luaL_checkstring(L, 1);
   int options = luaL_optint(L, 2, 0);
   int err_code;
@@ -210,7 +210,7 @@ static const struct luaL_Reg re_methods[] = {
 };
 
 static const struct luaL_Reg re_functions[] = {
-  { "new", regexp_new },
+  { "compile", regexp_compile },
   { NULL, NULL }
 };
 
@@ -232,7 +232,7 @@ int luaopen_cs_utf8_regexp(lua_State *L) {
 
   RE_NEW_OPTION_MAP(RE_NEW_OPTION_GEN);
 
-  lua_setfield(L, -2, "RegExp");
+  lua_setfield(L, -2, "regexp");
 
   return 1;
 }
