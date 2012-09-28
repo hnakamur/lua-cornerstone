@@ -56,7 +56,10 @@ typedef struct cs_matchres_s {
   XX(NO_START_OPTIMISE) \
   XX(PARTIAL_HARD) \
   XX(NOTEMPTY_ATSTART) \
-  XX(UCP)
+  XX(UCP) \
+  XX(STUDY_JIT_COMPILE) \
+  XX(STUDY_JIT_PARTIAL_HARD_COMPILE) \
+  XX(STUDY_JIT_PARTIAL_SOFT_COMPILE)
 
 #define RE_OPTION_GEN(name) \
   lua_pushnumber(L, PCRE_##name); \
@@ -65,6 +68,11 @@ typedef struct cs_matchres_s {
 static int regexp_compile(lua_State *L) {
   const char *pattern = luaL_checkstring(L, 1);
   int options = luaL_optint(L, 2, 0) | PCRE_UTF8;
+  int study_options_type = lua_type(L, 3);
+  int study_options;
+  if (study_options_type != LUA_TNIL) {
+    study_options = luaL_optint(L, 3, PCRE_STUDY_JIT_COMPILE);
+  }
   int err_code;
   const char *err_text;
   int err_offset;
@@ -79,9 +87,11 @@ static int regexp_compile(lua_State *L) {
   if (!regexp->re)
     return luaL_error(L, "%s (pattern offset: %d)", err_text, err_offset + 1);
 
-  regexp->extra = pcre_study(regexp->re, 0, &err_text);
-  if (err_text)
-    return luaL_error(L, "%s", err_text);
+  if (study_options_type != LUA_TNIL) {
+    regexp->extra = pcre_study(regexp->re, study_options, &err_text);
+    if (err_text)
+      return luaL_error(L, "%s", err_text);
+  }
 
   pcre_fullinfo(regexp->re, regexp->extra, PCRE_INFO_CAPTURECOUNT,
       &regexp->capture_cnt);
