@@ -71,11 +71,6 @@ static int regexp_compile(lua_State *L) {
   if (err_text)
     return luaL_error(L, "%s", err_text);
 
-  int utf8_supported = 0;
-  pcre_config(PCRE_CONFIG_UTF8, &utf8_supported);
-  if (utf8_supported == 0)
-    return luaL_error(L, "PCRE_CONFIG_UTF8_DISABLED");
-
   pcre_fullinfo(regexp->re, regexp->extra, PCRE_INFO_CAPTURECOUNT,
       &regexp->capture_cnt);
 
@@ -307,6 +302,11 @@ static const struct luaL_Reg re_functions[] = {
 };
 
 int luaopen_cs_utf8_regexp(lua_State *L) {
+  int utf8_supported = 0;
+  pcre_config(PCRE_CONFIG_UTF8, &utf8_supported);
+  if (utf8_supported == 0)
+    return luaL_error(L, "PCRE_CONFIG_UTF8_DISABLED");
+
   luaL_newmetatable(L, MR_MTBL_NAME);
   luaL_register(L, NULL, mr_methods);
   lua_setfield(L, -1, "__index");
