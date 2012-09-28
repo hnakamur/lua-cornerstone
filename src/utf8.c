@@ -1,7 +1,5 @@
 #include "cornerstone-priv.h"
 
-typedef unsigned char uchar;
-
 #define UTF8_IS_HEAD_BYTE(bptr) (((*(const uchar *)bptr) & 0xC0) != 0x80)
 #define UTF8_IS_TAIL_BYTE(bptr) (((*(const uchar *)bptr) & 0xC0) == 0x80)
 

@@ -5,6 +5,8 @@
 #include <string.h>
 #include <lauxlib.h>
 #include "cornerstone.h"
+
+typedef unsigned char uchar;
  
 int luaopen_cs_string(lua_State *L);
 int luaopen_cs_utf8(lua_State *L);

@@ -119,6 +119,37 @@ exports['regexp.match.capture.no_such_name_case2'] = function(test)
   test.done()
 end
 
+exports['regexp.match.dupnames'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(?|(?<a>x)(?<b>y)|(?<a>z)(?<b>w))]])
+  local mr = re:match('xy')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 2)
+  test.equal(mr:group('a'), 'x')
+  test.equal(mr:group('b'), 'y')
+
+  mr = re:match('zw')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 2)
+  test.equal(mr:group('a'), 'z')
+  test.equal(mr:group('b'), 'w')
+
+  test.done()
+end
+
+exports['regexp.match.dupnames.case2'] = function(test)
+  local cs = require('cornerstone')
+  local regexp = cs.utf8.regexp
+  local re = regexp.compile([[(?<a>\w+) (?<a>\w+)]], regexp.DUPNAMES)
+  local mr = re:match('Roberto Ierusalimschy')
+  test.ok(mr)
+  test.equal(mr:captureCount(), 2)
+  test.equal(mr:group('a'), 'Roberto')
+
+  test.done()
+end
+
 exports['regexp.match.utf8'] = function(test)
   local cs = require('cornerstone')
   local regexp = cs.utf8.regexp

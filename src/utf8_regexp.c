@@ -222,6 +222,37 @@ static int matchres_last(lua_State *L) {
   return 1;
 }
 
+/*
+ * Ported from get_first_set() in pcre_get.c in pcre source.
+ */
+static int matchres_first_set(cs_matchres_t *mr, const char *group_name) {
+  cs_regexp_t *regexp = mr->regexp;
+  pcre *re = regexp->re;
+  pcre_extra *extra = regexp->extra;
+  unsigned long options;
+  int jchanged;
+  pcre_fullinfo(re, extra, PCRE_INFO_OPTIONS, &options);
+  pcre_fullinfo(re, extra, PCRE_INFO_JCHANGED, &jchanged);
+  if (options & PCRE_DUPNAMES || jchanged) {
+    char *first;
+    char *last;
+    uchar *entry;
+    int entry_len = pcre_get_stringtable_entries(re, group_name, &first, &last);
+    if (entry_len < 0) {
+      return entry_len;
+    }
+    for (entry = (uchar *)first; entry <= (uchar *)last; entry += entry_len) {
+      int n = entry[0] << 8 | entry[1];
+      if (mr->ovector[n * 2] >= 0) {
+        return n;
+      }
+    }
+    return entry[0] << 8 | entry[1];
+  } else {
+    return pcre_get_stringnumber(re, group_name);
+  }
+}
+
 static int matchres_group(lua_State *L) {
   cs_matchres_t *mr = (cs_matchres_t *)luaL_checkudata(L, 1, MR_MTBL_NAME);
   int group_type = lua_type(L, 2);
@@ -230,14 +261,14 @@ static int matchres_group(lua_State *L) {
     group = luaL_optint(L, 2, 0);
   } else if (group_type == LUA_TSTRING) {
     const char *group_name = luaL_checkstring(L, 2);
-    group = pcre_get_stringnumber(mr->regexp->re, group_name);
+    group = matchres_first_set(mr, group_name);
     if (group < 0) {
       return luaL_error(L, regexp_exec_errname(group));
     }
   } else if (group_type == LUA_TNIL || group_type == LUA_TNONE) {
     group = 0;
   } else {
-    return luaL_error(L, "must be number or string.");
+    return luaL_error(L, "must be number, string or nil.");
   }
   int first_byte_pos = mr->ovector[group * 2] + 1;
   int last_byte_pos = mr->ovector[group * 2 + 1];
