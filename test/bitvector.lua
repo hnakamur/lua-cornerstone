@@ -4,12 +4,24 @@ exports['bitvector'] = function(test)
   local cs = require('cornerstone')
   local v = bitvector.new(1000)
   test.equal(type(v), 'userdata')
-  test.equal(bitvector.length(v), 1000)
+  test.equal(v:length(), 1000)
   for i = 1, 1000 do
-    bitvector.set(v, i, i % 5 == 0)
+    v:set(i, i % 5 == 0)
   end
-  test.ok(bitvector.get(v, 10))
+  test.ok(v:get(10))
   test.done()
+end
+
+exports['bitvector.__len'] = function(test)
+  local cs = require('cornerstone')
+  local v = bitvector.new(1000)
+  test.equal(#v, 1000)
+end
+
+exports['bitvector.__tostring'] = function(test)
+  local cs = require('cornerstone')
+  local v = bitvector.new(1000)
+  test.equal(tostring(v), 'bitvector(1000)')
 end
 
 exports['bitvector.checkudata'] = function(test)

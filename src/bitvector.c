@@ -66,17 +66,32 @@ static int bitvector_length(lua_State *L) {
   return 1;
 }
 
-static const struct luaL_Reg bitvector_functions[] = {
+static int bitvector_tostring(lua_State *L) {
+  cs_bitvector_t *v = cs_checkbitvector(L, 1);
+  lua_pushfstring(L, "bitvector(%d)", v->length);
+  return 1;
+}
+
+static const struct luaL_Reg bitvector_methods[] = {
+  { "__len", bitvector_length },
+  { "__tostring", bitvector_tostring },
   { "get", bitvector_get },
   { "length", bitvector_length },
-  { "new", bitvector_new },
   { "set", bitvector_set },
+  { NULL, NULL }
+};
+
+static const struct luaL_Reg bitvector_functions[] = {
+  { "new", bitvector_new },
   { NULL, NULL }
 };
 
 int luaopen_cs_bitvector(lua_State *L) {
   luaL_newmetatable(L, BITVECTOR_MTBL_NAME);
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_register(L, NULL, bitvector_methods);
   luaL_register(L, "bitvector", bitvector_functions);
-  lua_pop(L, 1);
+  lua_pop(L, 2);
   return 1;
 }
