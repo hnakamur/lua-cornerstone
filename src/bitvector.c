@@ -59,6 +59,16 @@ static int bitvector_get(lua_State *L) {
   return 1;
 }
 
+static int bitvector_index(lua_State *L) {
+  const char *key = luaL_checkstring(L, 2);
+  lua_getmetatable(L, 1);
+  lua_getfield(L, -1, key);
+  if (!lua_isnil(L, -1))
+    return 1;
+  lua_pop(L, 1);
+  return bitvector_get(L);
+}
+
 static int bitvector_length(lua_State *L) {
   cs_bitvector_t *v = cs_checkbitvector(L, 1);
   luaL_argcheck(L, v != NULL, 1, "'bitvector' expected");
@@ -73,7 +83,9 @@ static int bitvector_tostring(lua_State *L) {
 }
 
 static const struct luaL_Reg bitvector_methods[] = {
+  { "__index", bitvector_index },
   { "__len", bitvector_length },
+  { "__newindex", bitvector_set },
   { "__tostring", bitvector_tostring },
   { "get", bitvector_get },
   { "length", bitvector_length },
@@ -88,8 +100,6 @@ static const struct luaL_Reg bitvector_functions[] = {
 
 int luaopen_cs_bitvector(lua_State *L) {
   luaL_newmetatable(L, BITVECTOR_MTBL_NAME);
-  lua_pushvalue(L, -1);
-  lua_setfield(L, -2, "__index");
   luaL_register(L, NULL, bitvector_methods);
   luaL_register(L, "bitvector", bitvector_functions);
   lua_pop(L, 2);
