@@ -8,6 +8,7 @@
 
 typedef unsigned char uchar;
  
+int luaopen_cs_bitvector(lua_State *L);
 int luaopen_cs_string(lua_State *L);
 int luaopen_cs_utf8(lua_State *L);
 int luaopen_cs_utf8_regexp(lua_State *L);
