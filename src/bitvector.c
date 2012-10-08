@@ -1,5 +1,6 @@
 #include <lauxlib.h>
 #include <limits.h>
+#include "cornerstone-priv.h"
 
 #define BITVECTOR_MTBL_NAME "cs.BitVector"
 #define cs_checkbitvector(L, index) \
@@ -78,7 +79,7 @@ static int bitvector_length(lua_State *L) {
 
 static int bitvector_tostring(lua_State *L) {
   cs_bitvector_t *v = cs_checkbitvector(L, 1);
-  lua_pushfstring(L, "bitvector(%d)", v->length);
+  lua_pushfstring(L, "cs.BitVector(%d)", v->length);
   return 1;
 }
 
@@ -101,7 +102,11 @@ static const struct luaL_Reg bitvector_functions[] = {
 int luaopen_cs_bitvector(lua_State *L) {
   luaL_newmetatable(L, BITVECTOR_MTBL_NAME);
   luaL_register(L, NULL, bitvector_methods);
-  luaL_register(L, "bitvector", bitvector_functions);
-  lua_pop(L, 2);
+  lua_pop(L, 1);
+
+  lua_createtable(L, 0, ARRAY_SIZE(bitvector_functions) - 1);
+  luaL_register(L, NULL, bitvector_functions);
+  lua_setfield(L, -2, "BitVector");
+
   return 1;
 }
